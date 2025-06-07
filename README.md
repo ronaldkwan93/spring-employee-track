@@ -1,5 +1,11 @@
 # Employee Tracker
 
+## To get started, Run
+
+```bash
+mvn spring-boot:run
+```
+
 ## Backend
 
 ### Libraries
