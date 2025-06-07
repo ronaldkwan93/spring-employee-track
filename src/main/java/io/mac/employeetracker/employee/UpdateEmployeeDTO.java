@@ -3,39 +3,33 @@ package io.mac.employeetracker.employee;
 import java.sql.Date;
 import io.mac.employeetracker.employee.Employee.Contract;
 import io.mac.employeetracker.employee.Employee.EmploymentType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public class UpdateEmployeeDTO {
-    @NotBlank
+
+    @Pattern(regexp = ".*\\S.*", message = "firstName cannot be empty")
     private String firstName;
-
+    @Pattern(regexp = ".*\\S.*", message = "middlename cannot be empty")
     private String middlename;
-
-    @NotBlank
+    @Pattern(regexp = ".*\\S.*", message = "lastName cannot be empty")
     private String lastName;
-
-    @NotBlank
+    @Pattern(regexp = ".*\\S.*", message = "email cannot be empty")
     private String email;
-
-    @NotBlank
+    @Pattern(regexp = ".*\\S.*", message = "mobile cannot be empty")
     private String mobile;
-
-    @NotBlank
+    @Pattern(regexp = ".*\\S.*", message = "address cannot be empty")
     private String address;
 
-    @NotNull
     private Contract contractType;
 
-    @NotNull
     private Date startDate;
 
     private Date endDate;
 
-    @NotNull
     private EmploymentType employmentType;
 
     private Integer hoursPerWeek;
+
 
     public String getFirstName() {
         return firstName;
