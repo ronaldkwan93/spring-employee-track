@@ -28,6 +28,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+    @CrossOrigin
     @PostMapping
     public ResponseEntity<Employee> create(@Valid @RequestBody CreateEmployeeDTO data) {
         Employee saved = this.employeeService.create(data);
@@ -41,6 +42,7 @@ public class EmployeeController {
         return new ResponseEntity<>(allEmployees, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping("/{id}")
     public ResponseEntity<Employee> getbyId(@PathVariable Long id) throws NotFoundException {
         // check if employee exists
@@ -55,6 +57,7 @@ public class EmployeeController {
 
     }
 
+    @CrossOrigin
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) throws NotFoundException {
         Optional<Employee> existingEmployee = this.employeeService.findById(id);
@@ -65,6 +68,7 @@ public class EmployeeController {
         throw new NotFoundException("Book with id " + id + " does not exist");
     }
 
+    @CrossOrigin
     @PatchMapping("{id}")
     public ResponseEntity<Employee> updateById(@PathVariable Long id, @Valid @RequestBody UpdateEmployeeDTO data)
             throws NotFoundException {
