@@ -9,7 +9,6 @@ public class UpdateEmployeeDTO {
 
     @Pattern(regexp = ".*\\S.*", message = "firstName cannot be empty")
     private String firstName;
-    @Pattern(regexp = ".*\\S.*", message = "middlename cannot be empty")
     private String middlename;
     @Pattern(regexp = ".*\\S.*", message = "lastName cannot be empty")
     private String lastName;
