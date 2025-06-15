@@ -1,10 +1,14 @@
 package io.mac.employeetracker.employee;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import io.mac.employeetracker.employee.Employee.Contract;
+import io.mac.employeetracker.employee.Employee.EmploymentType;
 
 @Service
 public class EmployeeService {
@@ -102,6 +106,47 @@ public class EmployeeService {
 
         this.employeeRepository.save(employeefromDB);
         return Optional.of(employeefromDB);
+    }
+
+    public EmployeeStatsDTO getStatistics() {
+        List<Employee> employees = this.employeeRepository.findAll();
+        LocalDate now = LocalDate.now();
+        LocalDate inOneMonth = now.plusDays(30);
+
+        EmployeeStatsDTO stats = new EmployeeStatsDTO();
+        stats.total = employees.size();
+
+        for (Employee emp : employees) {
+            if (emp.getStartDate() != null) {
+                LocalDate empStartDate = emp.getStartDate().toInstant()
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toLocalDate();
+                if (empStartDate.getMonthValue() == now.getMonthValue() &&
+                        empStartDate.getYear() == now.getYear()) {
+                    stats.newHires++;
+                }
+            }
+            if (emp.getEndDate() != null) {
+                LocalDate empEndDate = emp.getEndDate().toInstant()
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toLocalDate();
+                if (empEndDate.isAfter(now) && empEndDate.isBefore(inOneMonth)) {
+                    stats.endingSoon++;
+                }
+            }
+
+            if (emp.getContractType() == Contract.CONTRACT) {
+                stats.contract++;
+            }
+            if (emp.getContractType() == Contract.PERMANENT) {
+                stats.permanent++;
+            }
+            if (emp.getEmploymentType() == EmploymentType.FULL_TIME)
+                stats.fullTime++;
+            if (emp.getEmploymentType() == EmploymentType.PART_TIME)
+                stats.partTime++;
+        }
+        return stats;
     }
 
 }

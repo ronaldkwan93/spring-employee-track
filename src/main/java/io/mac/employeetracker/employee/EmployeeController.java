@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.mac.employeetracker.common.exceptions.NotFoundException;
 import jakarta.validation.Valid;
 
+
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
@@ -78,4 +79,11 @@ public class EmployeeController {
 
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
+
+    @CrossOrigin
+    @GetMapping("/statistics")
+    public EmployeeStatsDTO getEmployeeStats() {
+       return this.employeeService.getStatistics();
+    }
+    
 }
