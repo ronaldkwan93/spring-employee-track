@@ -3,6 +3,7 @@ package io.mac.employeetracker.employee;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -147,6 +148,47 @@ public class EmployeeService {
                 stats.partTime++;
         }
         return stats;
+    }
+
+    public Optional<List<Employee>> findListByCategory(String filterField, String filterValue) {
+        List<Employee> filteredEmployees = this.employeeRepository.findAll().stream()
+                .filter(employee -> {
+                    switch (filterField) {
+                        case "contractType":
+                            return employee.getContractType().name().equalsIgnoreCase(filterValue);
+                        case "employmentType":
+                            return employee.getEmploymentType().name().equalsIgnoreCase(filterValue);
+                        case "newHires":
+                            return checkIfNewHire(employee);
+                        case "upcomingEnds":
+                            return checkIfUpcomingEnd(employee);
+                        default:
+                            return false;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        return filteredEmployees.isEmpty() ? Optional.empty() : Optional.of(filteredEmployees);
+    }
+
+    private boolean checkIfUpcomingEnd(Employee employee) {
+        if (employee.getEndDate() == null) {
+            return false;
+        }
+        LocalDate end = employee.getEndDate().toInstant()
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDate();
+        LocalDate now = LocalDate.now();
+        LocalDate inOneMonth = now.plusDays(30);
+        return end.isAfter(now) && end.isBefore(inOneMonth);
+    }
+
+    private boolean checkIfNewHire(Employee employee) {
+        LocalDate start = employee.getStartDate().toInstant()
+                .atZone(java.time.ZoneId.systemDefault())
+                .toLocalDate();
+        LocalDate now = LocalDate.now();
+        return (start.getMonth() == now.getMonth() && start.getYear() == now.getYear());
     }
 
 }
