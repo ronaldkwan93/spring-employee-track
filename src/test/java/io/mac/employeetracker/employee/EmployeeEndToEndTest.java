@@ -140,12 +140,35 @@ public class EmployeeEndToEndTest {
         data.put("startDate", "2022-05-29");
         data.put("endDate", "2020-06-29");
         data.put("employmentType", "PART_TIME");
-        data.put("hoursPerWeek",50);
+        data.put("hoursPerWeek", 50);
         given()
                 .contentType(ContentType.JSON)
                 .body(data)
                 .when().post("/employees")
                 .then()
                 .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    public void createEmployee_InvalidData_BadRequest() {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("firstName", "Jae");
+        given()
+                .contentType(ContentType.JSON)
+                .body(data)
+                .when()
+                .post("/employees")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void createEmployee_EmptyRequestBody_BadRequest() {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/employees")
+                .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }
