@@ -6,7 +6,6 @@ import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy.Content;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -35,18 +34,6 @@ public class EmployeeEndToEndTest {
 
         this.employeeRepository.deleteAll();
         this.employees.clear();
-
-        // "firstName": "Ron",
-        // "middlename": "PF",
-        // "lastName": "Kwan",
-        // "email": "ronaldkwan90@gmail.com",
-        // "mobile": "0432442263",
-        // "address": "123 king street",
-        // "contractType": "PERMANENT",
-        // "startDate": "1993-05-30",
-        // "endDate" : "2000-06-30",
-        // "employmentType": "FULL_TIME",
-        // "hoursPerWeek": 40
 
         Employee employee1 = new Employee();
         employee1.setFirstName("Ron");
@@ -91,10 +78,7 @@ public class EmployeeEndToEndTest {
 
     @Test
     public void getAllEmployees_EmployeesInDB_ReturnsSuccess() {
-        // arrange
-        // act
         given().when().get("/employees").then().statusCode(HttpStatus.OK.value()).body("$", hasSize(2));
-        // assert
     }
 
     @Test
@@ -170,5 +154,73 @@ public class EmployeeEndToEndTest {
                 .post("/employees")
                 .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    public void editEmployee_invalidIdWithValidBody_NotFound() {
+        long invalidId = 12345678L;
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("firstName", "Jae");
+        data.put("middlename", "PF");
+        data.put("lastName", "PL");
+        data.put("email", "PL@gmail.com");
+        data.put("mobile", "0432442264");
+        data.put("address", "234 king street");
+        data.put("contractType", "PERMANENT");
+        data.put("startDate", "2022-05-29");
+        data.put("endDate", "2020-06-29");
+        data.put("employmentType", "PART_TIME");
+        data.put("hoursPerWeek", 50);
+        given()
+                .contentType(ContentType.JSON)
+                .body(data)
+                .when()
+                .patch("/employees/" + invalidId)
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void editEmployee_validIdWithOptionalData_Success() {
+        long valid = 1;
+
+        HashMap<String, Object> data = new HashMap<>();
+
+        data.put("email", "PL@gmail.com");
+        data.put("mobile", "0432442264");
+        data.put("address", "234 king street");
+        data.put("contractType", "PERMANENT");
+        data.put("startDate", "2022-05-29");
+        data.put("endDate", "2020-06-29");
+        data.put("employmentType", "PART_TIME");
+        data.put("hoursPerWeek", 50);
+        given()
+                .contentType(ContentType.JSON)
+                .body(data)
+                .when()
+                .patch("/employees/" + valid)
+                .then()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    public void deleteEmployee_validId_NoContent() {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("/employees/1")
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void deleteEmployee_InvalidId_NotFound() {
+        given()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("/employees/50")
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 }
