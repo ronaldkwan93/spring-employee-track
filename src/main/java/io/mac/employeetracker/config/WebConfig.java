@@ -8,7 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     public void addCorsMapping(CorsRegistry registry) {
-        String[] allowedOrigins = { "http://localhost:5173/", "http://120.0.0.1:5173/" };
+        String[] allowedOrigins = { "http://localhost:5173/", "http://120.0.0.1:5173/",
+                "https://pulseboardio.netlify.app/" };
         registry.addMapping("/**").allowedOrigins(allowedOrigins).allowedMethods("*").allowedHeaders("*");
     }
 

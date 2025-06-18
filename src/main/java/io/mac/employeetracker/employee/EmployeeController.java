@@ -43,6 +43,12 @@ public class EmployeeController {
     }
 
     @CrossOrigin
+    @GetMapping("/statistics")
+    public EmployeeStatsDTO getEmployeeStats() {
+        return this.employeeService.getStatistics();
+    }
+
+    @CrossOrigin
     @GetMapping("/{id}")
     public ResponseEntity<Employee> getbyId(@PathVariable Long id) throws NotFoundException {
         // check if employee exists
@@ -77,12 +83,6 @@ public class EmployeeController {
                 () -> new NotFoundException("Could not updated Employee with id " + id + " , it does not exists"));
 
         return new ResponseEntity<>(updated, HttpStatus.OK);
-    }
-
-    @CrossOrigin
-    @GetMapping("/statistics")
-    public EmployeeStatsDTO getEmployeeStats() {
-        return this.employeeService.getStatistics();
     }
 
     @CrossOrigin
