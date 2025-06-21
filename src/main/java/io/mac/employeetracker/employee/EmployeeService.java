@@ -1,15 +1,10 @@
 package io.mac.employeetracker.employee;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import io.mac.employeetracker.employee.Employee.Contract;
-import io.mac.employeetracker.employee.Employee.EmploymentType;
 
 @Service
 public class EmployeeService {
@@ -99,7 +94,7 @@ public class EmployeeService {
         // employeefromDB.setHoursPerWeek(data.getHoursPerWeek());
         // }
 
-        // implemented Model Mapper library
+        // refactored & implemented Model Mapper library
 
         Employee employeefromDB = foundEmployee.get();
 
@@ -110,85 +105,114 @@ public class EmployeeService {
     }
 
     public EmployeeStatsDTO getStatistics() {
-        List<Employee> employees = this.employeeRepository.findAll();
-        LocalDate now = LocalDate.now();
-        LocalDate inOneMonth = now.plusDays(30);
+        // refactored code to native query on repository
+        // List<Employee> employees = this.employeeRepository.findAll();
+        // LocalDate now = LocalDate.now();
+        // LocalDate inOneMonth = now.plusDays(30);
 
         EmployeeStatsDTO stats = new EmployeeStatsDTO();
-        stats.total = employees.size();
+        // stats.total = employees.size();
+        stats.total = this.employeeRepository.allEmployeeCount();
+        stats.contract = this.employeeRepository.allContractCount();
+        stats.permanent = this.employeeRepository.allPermanentCount();
+        stats.fullTime = this.employeeRepository.allFullTimeCount();
+        stats.partTime = this.employeeRepository.allPartTimeCount();
+        stats.newHires = this.employeeRepository.allNewHireCount();
+        stats.endingSoon = this.employeeRepository.allEndingSoonCount();
 
-        for (Employee emp : employees) {
-            if (emp.getStartDate() != null) {
-                LocalDate empStartDate = emp.getStartDate().toInstant()
-                        .atZone(java.time.ZoneId.systemDefault())
-                        .toLocalDate();
-                if (empStartDate.getMonthValue() == now.getMonthValue() &&
-                        empStartDate.getYear() == now.getYear()) {
-                    stats.newHires++;
-                }
-            }
-            if (emp.getEndDate() != null) {
-                LocalDate empEndDate = emp.getEndDate().toInstant()
-                        .atZone(java.time.ZoneId.systemDefault())
-                        .toLocalDate();
-                if (empEndDate.isAfter(now) && empEndDate.isBefore(inOneMonth)) {
-                    stats.endingSoon++;
-                }
-            }
-
-            if (emp.getContractType() == Contract.CONTRACT) {
-                stats.contract++;
-            }
-            if (emp.getContractType() == Contract.PERMANENT) {
-                stats.permanent++;
-            }
-            if (emp.getEmploymentType() == EmploymentType.FULL_TIME)
-                stats.fullTime++;
-            if (emp.getEmploymentType() == EmploymentType.PART_TIME)
-                stats.partTime++;
-        }
+        // refactored code to native query on repository
+        // for (Employee emp : employees) {
+        // // if (emp.getStartDate() != null) {
+        // // LocalDate empStartDate = emp.getStartDate().toInstant()
+        // // .atZone(java.time.ZoneId.systemDefault())
+        // // .toLocalDate();
+        // // if (empStartDate.getMonthValue() == now.getMonthValue() &&
+        // // empStartDate.getYear() == now.getYear()) {
+        // // stats.newHires++;
+        // // }
+        // // // newHires
+        // // }
+        // // if (emp.getEndDate() != null) {
+        // // LocalDate empEndDate = emp.getEndDate().toInstant()
+        // // .atZone(java.time.ZoneId.systemDefault())
+        // // .toLocalDate();
+        // // if (empEndDate.isAfter(now) && empEndDate.isBefore(inOneMonth)) {
+        // // stats.endingSoon++;
+        // // }
+        // // // endingSoon
+        // // }
+        // // if (emp.getContractType() == Contract.CONTRACT) {
+        // // stats.contract++;
+        // // // contract
+        // // }
+        // // if (emp.getContractType() == Contract.PERMANENT) {
+        // // stats.permanent++;
+        // // // permanent
+        // // }
+        // // if (emp.getEmploymentType() == EmploymentType.FULL_TIME)
+        // // stats.fullTime++;
+        // // // full time
+        // // if (emp.getEmploymentType() == EmploymentType.PART_TIME)
+        // // stats.partTime++;
+        // // // part time
+        // }
         return stats;
     }
 
-    public Optional<List<Employee>> findListByCategory(String filterField, String filterValue) {
-        List<Employee> filteredEmployees = this.employeeRepository.findAll().stream()
-                .filter(employee -> {
-                    switch (filterField) {
-                        case "contractType":
-                            return employee.getContractType().name().equalsIgnoreCase(filterValue);
-                        case "employmentType":
-                            return employee.getEmploymentType().name().equalsIgnoreCase(filterValue);
-                        case "newHires":
-                            return checkIfNewHire(employee);
-                        case "upcomingEnds":
-                            return checkIfUpcomingEnd(employee);
-                        default:
-                            return false;
-                    }
-                })
-                .collect(Collectors.toList());
+    public List<Employee> findListByCategory(String filterField, String filterValue) {
 
-        return filteredEmployees.isEmpty() ? Optional.empty() : Optional.of(filteredEmployees);
+        return switch (filterField) {
+            case "contractType" ->
+                this.employeeRepository.getALlByContractType(filterValue);
+            case "employmentType" ->
+                this.employeeRepository.getAllByEmploymentType(filterValue);
+            case "newHires" -> this.employeeRepository.getAllNewHires();
+            case "upcomingEnds" -> this.employeeRepository.getAllUpcomingContractEnds();
+            default -> this.employeeRepository.findAll();
+        };
+
+        // refactored code to native query on repository
+        // List<Employee> filteredEmployees =
+        // this.employeeRepository.findAll().stream()
+        // .filter(employee -> {
+        // switch (filterField) {
+        // case "contractType":
+        // return employee.getContractType().name().equalsIgnoreCase(filterValue);
+        // case "employmentType":
+        // return employee.getEmploymentType().name().equalsIgnoreCase(filterValue);
+        // case "newHires":
+        // return checkIfNewHire(employee);
+        // case "upcomingEnds":
+        // return checkIfUpcomingEnd(employee);
+        // default:
+        // return false;
+        // }
+        // })
+        // .collect(Collectors.toList());
+        // return filteredEmployees.isEmpty() ? Optional.empty() :
+        // Optional.of(filteredEmployees);
     }
 
-    private boolean checkIfUpcomingEnd(Employee employee) {
-        if (employee.getEndDate() == null) {
-            return false;
-        }
-        LocalDate end = employee.getEndDate().toInstant()
-                .atZone(java.time.ZoneId.systemDefault())
-                .toLocalDate();
-        LocalDate now = LocalDate.now();
-        LocalDate inOneMonth = now.plusDays(30);
-        return end.isAfter(now) && end.isBefore(inOneMonth);
-    }
+    // refactored code to native query on repository
+    // private boolean checkIfUpcomingEnd(Employee employee) {
+    //     if (employee.getEndDate() == null) {
+    //         return false;
+    //     }
+    //     LocalDate end = employee.getEndDate().toInstant()
+    //             .atZone(java.time.ZoneId.systemDefault())
+    //             .toLocalDate();
+    //     LocalDate now = LocalDate.now();
+    //     LocalDate inOneMonth = now.plusDays(30);
+    //     return end.isAfter(now) && end.isBefore(inOneMonth);
+    // }
 
-    private boolean checkIfNewHire(Employee employee) {
-        LocalDate start = employee.getStartDate().toInstant()
-                .atZone(java.time.ZoneId.systemDefault())
-                .toLocalDate();
-        LocalDate now = LocalDate.now();
-        return (start.getMonth() == now.getMonth() && start.getYear() == now.getYear());
-    }
+    // refactored code to native query on repository
+    // private boolean checkIfNewHire(Employee employee) {
+    //     LocalDate start = employee.getStartDate().toInstant()
+    //             .atZone(java.time.ZoneId.systemDefault())
+    //             .toLocalDate();
+    //     LocalDate now = LocalDate.now();
+    //     return (start.getMonth() == now.getMonth() && start.getYear() == now.getYear());
+    // }
 
 }

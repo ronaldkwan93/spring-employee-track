@@ -89,21 +89,17 @@ public class EmployeeController {
     @GetMapping("/list/{filterField}/{filterValue}")
     public ResponseEntity<List<Employee>> getListByCriteria(
             @PathVariable String filterField,
-            @PathVariable String filterValue) throws NotFoundException {
+            @PathVariable String filterValue) {
 
-        Optional<List<Employee>> foundEmployees;
+        List<Employee> employees;
 
         if ("none".equals(filterField) || "all".equals(filterValue) ||
                 filterField.isEmpty() || filterValue.isEmpty()) {
-            foundEmployees = Optional.of(this.employeeService.getAll());
+            employees = this.employeeService.getAll();
         } else {
-            foundEmployees = this.employeeService.findListByCategory(filterField, filterValue);
+            employees = this.employeeService.findListByCategory(filterField, filterValue);
         }
 
-        if (foundEmployees.isPresent()) {
-            return new ResponseEntity<>(foundEmployees.get(), HttpStatus.OK);
-        }
-
-        throw new NotFoundException("No employees found");
+        return ResponseEntity.ok(employees);
     }
 }

@@ -1,67 +1,67 @@
 package io.mac.employeetracker.employee;
 
 public class EmployeeStatsDTO {
-    public int total;
-    public int newHires;
-    public int contract;
-    public int permanent;
-    public int fullTime;
-    public int partTime;
-    public int endingSoon;
+    public long total;
+    public long newHires;
+    public long contract;
+    public long permanent;
+    public long fullTime;
+    public long partTime;
+    public long endingSoon;
 
-    public int getTotal() {
+    public long getTotal() {
         return total;
     }
 
-    public void setTotal(int total) {
+    public void setTotal(long total) {
         this.total = total;
     }
 
-    public int getNewHires() {
+    public long getNewHires() {
         return newHires;
     }
 
-    public void setNewHires(int newHires) {
+    public void setNewHires(long newHires) {
         this.newHires = newHires;
     }
 
-    public int getContract() {
+    public long getContract() {
         return contract;
     }
 
-    public void setContract(int contract) {
+    public void setContract(long contract) {
         this.contract = contract;
     }
 
-    public int getPermanent() {
+    public long getPermanent() {
         return permanent;
     }
 
-    public void setPermanent(int permanent) {
+    public void setPermanent(long permanent) {
         this.permanent = permanent;
     }
 
-    public int getFullTime() {
+    public long getFullTime() {
         return fullTime;
     }
 
-    public void setFullTime(int fullTime) {
+    public void setFullTime(long fullTime) {
         this.fullTime = fullTime;
     }
 
-    public int getPartTime() {
+    public long getPartTime() {
         return partTime;
     }
 
-    public void setPartTime(int partTime) {
+    public void setPartTime(long partTime) {
         this.partTime = partTime;
     }
 
-    public int getEndingSoon() {
+    public long getEndingSoon() {
         return endingSoon;
     }
 
-    public void setEndingSoon(int endingSoon) {
+    public void setEndingSoon(long endingSoon) {
         this.endingSoon = endingSoon;
     }
 }
