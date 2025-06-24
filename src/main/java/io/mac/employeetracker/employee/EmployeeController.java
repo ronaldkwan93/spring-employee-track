@@ -2,8 +2,6 @@ package io.mac.employeetracker.employee;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import io.mac.employeetracker.common.exceptions.NotFoundException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Validator;
 
 @RestController
 @RequestMapping("/employees")
@@ -32,7 +26,6 @@ public class EmployeeController {
 
     private final ObjectMapper objectMapper;
     private EmployeeService employeeService;
-    private Validator validator;
 
     EmployeeController(EmployeeService employeeService, ObjectMapper objectMapper) {
         this.employeeService = employeeService;
