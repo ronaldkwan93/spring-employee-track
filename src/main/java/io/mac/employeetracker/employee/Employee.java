@@ -65,6 +65,9 @@ public class Employee {
     @Column
     private Integer hoursPerWeek;
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -191,5 +194,13 @@ public class Employee {
 
     public void setHoursPerWeek(Integer hoursPerWeek) {
         this.hoursPerWeek = hoursPerWeek;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

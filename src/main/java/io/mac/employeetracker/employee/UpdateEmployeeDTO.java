@@ -29,7 +29,6 @@ public class UpdateEmployeeDTO {
 
     private Integer hoursPerWeek;
 
-
     public String getFirstName() {
         return firstName;
     }

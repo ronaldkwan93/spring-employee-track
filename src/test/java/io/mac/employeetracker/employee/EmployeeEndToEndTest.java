@@ -2,6 +2,7 @@ package io.mac.employeetracker.employee;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
@@ -111,9 +116,8 @@ public class EmployeeEndToEndTest {
     }
 
     @Test
-    public void createEmployee_WhenPassedValidData_Created() {
-
-        HashMap<String, Object> data = new HashMap<>();
+    public void createEmployee_WhenPassedValidData_Created() throws JsonProcessingException {
+        Map<String, Object> data = new HashMap<>();
         data.put("firstName", "Jae");
         data.put("middlename", "PF");
         data.put("lastName", "PL");
@@ -125,39 +129,30 @@ public class EmployeeEndToEndTest {
         data.put("endDate", "2020-06-29");
         data.put("employmentType", "PART_TIME");
         data.put("hoursPerWeek", 50);
-        given()
-                .contentType(ContentType.JSON)
-                .body(data)
-                .when().post("/employees")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
-    }
 
-    @Test
-    public void createEmployee_InvalidData_BadRequest() {
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("firstName", "Jae");
+        String employeeJson = new ObjectMapper().writeValueAsString(data);
+
         given()
-                .contentType(ContentType.JSON)
-                .body(data)
+                .multiPart("employee", employeeJson)
                 .when()
                 .post("/employees")
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+                .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
     public void createEmployee_EmptyRequestBody_BadRequest() {
         given()
                 .contentType(ContentType.JSON)
+                .body("{}")
                 .when()
                 .post("/employees")
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+                .statusCode(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
     }
 
     @Test
-    public void editEmployee_invalidIdWithValidBody_NotFound() {
+    public void editEmployee_invalidIdWithValidBody_NotFound() throws JsonProcessingException {
         long invalidId = 12345678L;
 
         HashMap<String, Object> data = new HashMap<>();
@@ -172,8 +167,9 @@ public class EmployeeEndToEndTest {
         data.put("endDate", "2020-06-29");
         data.put("employmentType", "PART_TIME");
         data.put("hoursPerWeek", 50);
+        String employeeJson = new ObjectMapper().writeValueAsString(data);
         given()
-                .contentType(ContentType.JSON)
+                .multiPart("employee", employeeJson)
                 .body(data)
                 .when()
                 .patch("/employees/" + invalidId)
@@ -182,7 +178,7 @@ public class EmployeeEndToEndTest {
     }
 
     @Test
-    public void editEmployee_validIdWithOptionalData_Success() {
+    public void editEmployee_validIdWithOptionalData_Success() throws JsonProcessingException {
         long valid = 1;
 
         HashMap<String, Object> data = new HashMap<>();
@@ -195,8 +191,9 @@ public class EmployeeEndToEndTest {
         data.put("endDate", "2020-06-29");
         data.put("employmentType", "PART_TIME");
         data.put("hoursPerWeek", 50);
+        String employeeJson = new ObjectMapper().writeValueAsString(data);
         given()
-                .contentType(ContentType.JSON)
+                .multiPart("employee", employeeJson)
                 .body(data)
                 .when()
                 .patch("/employees/" + valid)
@@ -207,7 +204,6 @@ public class EmployeeEndToEndTest {
     @Test
     public void deleteEmployee_validId_NoContent() {
         given()
-                .contentType(ContentType.JSON)
                 .when()
                 .delete("/employees/1")
                 .then()

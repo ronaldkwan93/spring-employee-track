@@ -2,8 +2,10 @@ package io.mac.employeetracker.employee;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,28 +13,43 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.mac.employeetracker.common.exceptions.NotFoundException;
-import jakarta.validation.Valid;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
 
+    private final ObjectMapper objectMapper;
     private EmployeeService employeeService;
+    private Validator validator;
 
-    EmployeeController(EmployeeService employeeService) {
+    EmployeeController(EmployeeService employeeService, ObjectMapper objectMapper) {
         this.employeeService = employeeService;
+        this.objectMapper = objectMapper;
+
     }
 
     @CrossOrigin
-    @PostMapping
-    public ResponseEntity<Employee> create(@Valid @RequestBody CreateEmployeeDTO data) {
-        Employee saved = this.employeeService.create(data);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Employee> create(
+            @RequestParam("employee") String employeeJson,
+            @RequestPart(value = "photo", required = false) MultipartFile photo) throws JsonProcessingException {
+
+        CreateEmployeeDTO data = objectMapper.readValue(employeeJson, CreateEmployeeDTO.class);
+
+        Employee saved = employeeService.create(data, photo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @CrossOrigin
@@ -75,12 +92,18 @@ public class EmployeeController {
     }
 
     @CrossOrigin
-    @PatchMapping("{id}")
-    public ResponseEntity<Employee> updateById(@PathVariable Long id, @Valid @RequestBody UpdateEmployeeDTO data)
-            throws NotFoundException {
-        Optional<Employee> result = this.employeeService.updateById(id, data);
+    @PatchMapping(value = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Employee> updateById(
+            @PathVariable Long id,
+            @RequestParam("employee") String employeeJson,
+            @RequestPart(value = "photo", required = false) MultipartFile photo)
+            throws JsonProcessingException, NotFoundException {
+
+        UpdateEmployeeDTO data = objectMapper.readValue(employeeJson, UpdateEmployeeDTO.class);
+
+        Optional<Employee> result = this.employeeService.updateById(id, data, photo);
         Employee updated = result.orElseThrow(
-                () -> new NotFoundException("Could not updated Employee with id " + id + " , it does not exists"));
+                () -> new NotFoundException("Could not update Employee with id " + id + " , it does not exist"));
 
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }

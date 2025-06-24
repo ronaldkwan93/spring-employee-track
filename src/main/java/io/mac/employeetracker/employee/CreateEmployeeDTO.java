@@ -37,6 +37,16 @@ public class CreateEmployeeDTO {
 
     private Integer hoursPerWeek;
 
+    private String profileImageUrl;
+
+    public String getprofileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setprofileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
     public String getFirstName() {
         return firstName;
     }

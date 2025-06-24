@@ -5,33 +5,34 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import io.mac.employeetracker.S3Service.S3Service;
 
 @Service
 public class EmployeeService {
     private EmployeeRepository employeeRepository;
     private ModelMapper modelMapper;
+    private S3Service s3Service;
 
-    EmployeeService(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
+    EmployeeService(EmployeeRepository employeeRepository, ModelMapper modelMapper, S3Service s3Service) {
         this.employeeRepository = employeeRepository;
         this.modelMapper = modelMapper;
+        this.s3Service = s3Service;
     }
 
-    public Employee create(CreateEmployeeDTO data) {
-        // Employee newEmployee = new Employee();
-        // newEmployee.setFirstName(data.getFirstName());
-        // newEmployee.setMiddlename(data.getMiddlename());
-        // newEmployee.setLastName(data.getLastName());
-        // newEmployee.setEmail(data.getEmail());
-        // newEmployee.setMobile(data.getMobile());
-        // newEmployee.setAddress(data.getAddress());
-        // newEmployee.setContractType(data.getContractType());
-        // newEmployee.setStartDate(data.getStartDate());
-        // newEmployee.setEndDate(data.getEndDate());
-        // newEmployee.setEmploymentType(data.getEmploymentType());
-        // newEmployee.setHoursPerWeek(data.getHoursPerWeek());
+    public Employee create(CreateEmployeeDTO data, MultipartFile photo) {
 
-        // implemented with ModelMapper library
+        String photoUrl = null;
+
+        if (photo != null && !photo.isEmpty()) {
+            photoUrl = s3Service.uploadFile(photo);
+        }
+
         Employee newEmployee = modelMapper.map(data, Employee.class);
+
+        newEmployee.setProfileImageUrl(photoUrl);
+
         Employee savedEmployee = this.employeeRepository.save(newEmployee);
         return savedEmployee;
     }
@@ -53,55 +54,23 @@ public class EmployeeService {
         this.employeeRepository.save(employee);
     }
 
-    public Optional<Employee> updateById(Long id, UpdateEmployeeDTO data) {
+    public Optional<Employee> updateById(Long id, UpdateEmployeeDTO data, MultipartFile photo) {
         Optional<Employee> foundEmployee = this.findById(id);
         if (foundEmployee.isEmpty()) {
             return foundEmployee;
         }
 
-        // Employee employeefromDB = foundEmployee.get();
-        // if(data.getFirstName() != null) {
-        // employeefromDB.setFirstName(data.getFirstName().trim());
-        // }
-        // if(data.getMiddlename() != null) {
-        // employeefromDB.setMiddlename(data.getMiddlename().trim());
-        // }
-        // if(data.getLastName() != null) {
-        // employeefromDB.setLastName(data.getLastName().trim());
-        // }
-        // if(data.getEmail() != null) {
-        // employeefromDB.setEmail(data.getEmail().trim());
-        // }
-        // if(data.getMobile() != null) {
-        // employeefromDB.setMobile(data.getMobile().trim());
-        // }
-        // if(data.getAddress() != null) {
-        // employeefromDB.setAddress(data.getAddress().trim());
-        // }
-        // if(data.getContractType() != null) {
-        // employeefromDB.setContractType(data.getContractType());
-        // }
-        // if(data.getStartDate() != null) {
-        // employeefromDB.setStartDate(data.getStartDate());
-        // }
-        // if(data.getEndDate() != null) {
-        // employeefromDB.setEndDate(data.getEndDate());
-        // }
-        // if(data.getEmploymentType() != null) {
-        // employeefromDB.setEmploymentType(data.getEmploymentType());
-        // }
-        // if(data.getHoursPerWeek() != null) {
-        // employeefromDB.setHoursPerWeek(data.getHoursPerWeek());
-        // }
+        Employee employeeFromDB = foundEmployee.get();
 
-        // refactored & implemented Model Mapper library
+        modelMapper.map(data, employeeFromDB);
 
-        Employee employeefromDB = foundEmployee.get();
+        if (photo != null && !photo.isEmpty()) {
+            String photoUrl = s3Service.uploadFile(photo);
+            employeeFromDB.setProfileImageUrl(photoUrl);
+        }
 
-        modelMapper.map(data, employeefromDB);
-
-        this.employeeRepository.save(employeefromDB);
-        return Optional.of(employeefromDB);
+        this.employeeRepository.save(employeeFromDB);
+        return Optional.of(employeeFromDB);
     }
 
     public EmployeeStatsDTO getStatistics() {
@@ -195,24 +164,25 @@ public class EmployeeService {
 
     // refactored code to native query on repository
     // private boolean checkIfUpcomingEnd(Employee employee) {
-    //     if (employee.getEndDate() == null) {
-    //         return false;
-    //     }
-    //     LocalDate end = employee.getEndDate().toInstant()
-    //             .atZone(java.time.ZoneId.systemDefault())
-    //             .toLocalDate();
-    //     LocalDate now = LocalDate.now();
-    //     LocalDate inOneMonth = now.plusDays(30);
-    //     return end.isAfter(now) && end.isBefore(inOneMonth);
+    // if (employee.getEndDate() == null) {
+    // return false;
+    // }
+    // LocalDate end = employee.getEndDate().toInstant()
+    // .atZone(java.time.ZoneId.systemDefault())
+    // .toLocalDate();
+    // LocalDate now = LocalDate.now();
+    // LocalDate inOneMonth = now.plusDays(30);
+    // return end.isAfter(now) && end.isBefore(inOneMonth);
     // }
 
     // refactored code to native query on repository
     // private boolean checkIfNewHire(Employee employee) {
-    //     LocalDate start = employee.getStartDate().toInstant()
-    //             .atZone(java.time.ZoneId.systemDefault())
-    //             .toLocalDate();
-    //     LocalDate now = LocalDate.now();
-    //     return (start.getMonth() == now.getMonth() && start.getYear() == now.getYear());
+    // LocalDate start = employee.getStartDate().toInstant()
+    // .atZone(java.time.ZoneId.systemDefault())
+    // .toLocalDate();
+    // LocalDate now = LocalDate.now();
+    // return (start.getMonth() == now.getMonth() && start.getYear() ==
+    // now.getYear());
     // }
 
 }
