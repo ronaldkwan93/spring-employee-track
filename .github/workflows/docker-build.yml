@@ -31,7 +31,15 @@ jobs:
       - name: Push Docker image
         run: docker push "${{ secrets.DOCKER_IMAGE }}"
 
-      - name: Trigger Render deploy
+      - name: Test Render API connection
         run: |
-          curl -X POST "https://api.render.com/deploy/${{ secrets.RENDER_URL }}" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
+          curl --request GET \
+            --url 'https://api.render.com/v1/services?limit=3' \
+            --header 'Accept: application/json' \
+            --header "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
+
+     
+      # - name: Trigger Render deploy
+      #   run: |
+      #     curl -X POST "https://api.render.com/deploy/${{ secrets.RENDER_URL }}" \
+      #       -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
