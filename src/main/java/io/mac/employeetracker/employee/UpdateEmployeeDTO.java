@@ -1,6 +1,7 @@
 package io.mac.employeetracker.employee;
 
 import java.sql.Date;
+
 import io.mac.employeetracker.employee.Employee.Contract;
 import io.mac.employeetracker.employee.Employee.EmploymentType;
 import jakarta.validation.constraints.Pattern;
@@ -20,6 +21,12 @@ public class UpdateEmployeeDTO {
     private String address;
 
     private Contract contractType;
+
+    private String position;
+
+    public String getPosition() {
+        return position;
+    }
 
     private Date startDate;
 

@@ -1,5 +1,6 @@
 package io.mac.employeetracker.employee;
 import java.sql.Date;
+
 import io.mac.employeetracker.employee.Employee.Contract;
 import io.mac.employeetracker.employee.Employee.EmploymentType;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,9 @@ public class CreateEmployeeDTO {
     @NotNull
     private Date startDate;
 
+    @NotNull
+    private String position;
+
     private Date endDate;
 
     @NotNull
@@ -49,6 +53,14 @@ public class CreateEmployeeDTO {
 
     public String getFirstName() {
         return firstName;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public String getPosition() {
+        return position;
     }
 
     public String getMiddlename() {
