@@ -33,7 +33,7 @@ jobs:
      
       - name: Trigger Render deploy
         run: |
-          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_URL }}/deploys" \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Accept: application/json"
 
