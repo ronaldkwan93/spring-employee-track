@@ -1,4 +1,4 @@
-name: Automated Docker Build Pipeline
+name: Automated Build Pipeline
 
 on:
   push:
