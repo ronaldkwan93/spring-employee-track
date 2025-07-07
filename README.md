@@ -1,5 +1,7 @@
 # Employee Tracker
 
+[![Automated Docker Build](https://github.com/ronaldkwan93/spring-employee-track/actions/workflows/docker-build.yml/badge.svg)](https://github.com/ronaldkwan93/spring-employee-track/actions/workflows/docker-build.yml)
+
 ## To get started, Run
 
 ```bash
